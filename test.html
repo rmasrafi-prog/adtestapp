@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ad SDK Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f4f6f8;
+    }
+    .panel {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+    }
+    button {
+      padding: 12px 18px;
+      margin: 6px 4px 6px 0;
+      cursor: pointer;
+    }
+    #logs {
+      background: #111;
+      color: #b9f6ca;
+      padding: 14px;
+      min-height: 150px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+  </style>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+window.addEventListener("load", function () {
+    const tg = window.Telegram && window.Telegram.WebApp;
+
+    if (tg) {
+        tg.ready();
+
+        console.log("Telegram WebApp SDK detected.");
+        console.log("Platform:", tg.platform);
+        console.log("Inside Telegram:", tg.initData ? "Yes" : "No");
+    } else {
+        console.log("Telegram WebApp SDK not detected.");
+    }
+});
+</script>
+</head>
+<body>
+  <div class="panel">
+    <h2>Rewarded Interstitial SDK Test</h2>
+    <p>Manual testing only. Use an authorized test zone.</p>
+
+    <button id="loadBtn">Load SDK</button>
+    <button id="showBtn" disabled>Show Test Ad</button>
+    <button id="clearBtn">Clear Logs</button>
+
+    <h3>Event Logs</h3>
+    <div id="logs">Ready. Load the SDK to begin.</div>
+  </div>
+
+  <script>
+    const logs = document.getElementById("logs");
+    const loadBtn = document.getElementById("loadBtn");
+    const showBtn = document.getElementById("showBtn");
+
+    function log(message) {
+      logs.textContent += "\n" +
+        new Date().toLocaleTimeString() + " — " + message;
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    loadBtn.addEventListener("click", function () {
+      if (document.getElementById("adSdk")) {
+        log("SDK load was already requested.");
+        return;
+      }
+
+      log("Requesting SDK script...");
+
+      const script = document.createElement("script");
+      script.id = "adSdk";
+      script.src = "https://yoszi.com/sdk.js";
+      script.dataset.zone = "12034723";
+      script.dataset.sdk = "show_12034723";
+
+      script.onload = function () {
+        log("SDK script loaded.");
+        showBtn.disabled = false;
+      };
+
+      script.onerror = function () {
+        log("SDK script failed to load. Check network and SDK documentation.");
+      };
+
+      document.head.appendChild(script);
+    });
+
+    showBtn.addEventListener("click", async function () {
+      const showAd = window.show_12034723;
+
+      if (typeof showAd !== "function") {
+        log("Show function is not available.");
+        return;
+      }
+
+      showBtn.disabled = true;
+      log("Calling the SDK show function...");
+
+      try {
+        const result = await showAd();
+        log("SDK show call completed. Result: " +
+          String(result));
+      } catch (error) {
+        log("SDK returned an error: " + error.message);
+      } finally {
+        showBtn.disabled = false;
+      }
+    });
+
+    document.getElementById("clearBtn").addEventListener(
+      "click", function () {
+        logs.textContent = "Logs cleared.";
+      }
+    );
+  </script>
+</body>
+</html>
