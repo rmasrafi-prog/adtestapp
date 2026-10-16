@@ -114,7 +114,7 @@ window.addEventListener("load", function () {
       try {
         const result = await showAd();
         log("SDK show call completed. Result: " +
-          String(result));
+  JSON.stringify(result, null, 2));
       } catch (error) {
         log("SDK returned an error: " + error.message);
       } finally {
